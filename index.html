@@ -147,7 +147,7 @@
   <script src="./assets/js/plugins/nouislider.min.js" type="text/javascript"></script>
   <!--	Plugin for Sharrre btn -->
   <script src="./assets/js/plugins/jquery.sharrre.js" type="text/javascript"></script>
-  <script src="./assets/js/plugins/typed.min.js" type="text/javascript"></script>
+  <script src="https://cdn.jsdelivr.net/npm/typeit@5.10.6/dist/typeit.min.js" type="text/javascript"></script>
   <script src="./assets/js/plugins/jquery.blockUI.js" type="text/javascript"></script>
   <!-- Control Center for Material Kit: parallax effects, scripts for the example pages etc -->
   <script src="./assets/js/material-kit.js?v=2.0.4" type="text/javascript"></script>
@@ -156,7 +156,7 @@
 
       const BASE_URL = "http://cit-scapetech-api.herokuapp.com/api";
       const STORAGE_KEY_GROUP = "currentGroup";
-
+      
       var currentGroup = JSON.parse(sessionStorage.getItem(STORAGE_KEY_GROUP));
       
       $.get(BASE_URL + "/groups", function(data, status){
@@ -210,13 +210,17 @@
           contentType: 'application/json',
           data: JSON.stringify(objectAnswer),
           dataType: 'json',
-          success: function(data){ 
+          success: function(data, status, xhr){ 
 
-            console.log(data);
+            if(xhr.status == 200){
+              addConsole('Você errou hahahahahha...');
+            }else if(xhr.status == 201){
+              addConsole('tudo de boa... tu é o cara!');
+            }
 
           }
         });                
-
+        
       });
 
       $("#checkin").click(function(){
@@ -275,20 +279,46 @@
         $.get(BASE_URL + "/room/qa/" + currentGroup.room, function(data, status){
           data.forEach(element => {
             $('#questions').append($('<option>', {
-                value: element.id,
-                text: element.id + " - " + element.question + " - (pontos " + element.num_points + ")"
+                value: element.question_number,
+                text: element.question_number + " - " + element.question_text + " - (pontos " + element.num_points + ")"
             }));
           })
         });
 
         $("#room_name").text(currentGroup.group_name + " - " + currentGroup.room_name);
 
-        $(".type-container-console").append($('<p>', { text : "teste de mensagem primeira mensagem" }));
-        $(".type-container-console").append($('<p>', { text : "teste de segunda mais texto" }));
-
-        var typed = new Typed('.type-container-console', {typeSpeed: 10, strings: ["First sentence.", "Second sentence."]});
-
       };
+
+      addConsole = function(message){
+
+        var count = parseInt(sessionStorage.getItem("countMessage"));
+
+        if(isNaN(count)){
+          count = 1;
+        }
+        
+        $(".type-container-console").append($('<p class="type-it message-'+ count +'"></p>'));
+
+        new TypeIt('.message-' + count, {
+          strings: message,
+          beforeString: function(instance){
+            var $this = $(".message-" + count);
+            
+            $this.scrollTop = 1000;
+
+          },
+          afterComplete: function (instance) {
+            instance.destroy();
+          }
+        });
+
+        count++;
+
+        console.log(count);
+
+        sessionStorage.setItem("countMessage", count);
+
+      }
 
       if(currentGroup != null && currentGroup.group){
         startRoom();

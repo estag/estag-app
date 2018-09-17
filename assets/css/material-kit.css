@@ -17,9 +17,11 @@
 
 .type-response {
   border: solid 1px #dedede;
-  min-height: 200px;
+  min-height: 400px;
   padding: 20px;
   background: #000;
+  overflow: auto;
+  height: 340px;
 }
 
 .type-response span {
